@@ -5,6 +5,7 @@ class Board(object):
 
     def __init__(self, topHero=None, bottomHero=None):
         self.heroes = {'top':topHero, 'bottom':bottomHero}
+        self.decks = {'top':None, 'bottom':None}
         self.hands = {'top':None, 'bottom':None}
         self.manaBase = {'top':1, 'bottom':1}
         self.manaCurrent = {'top':1, 'bottom':1} 
@@ -58,34 +59,33 @@ class Board(object):
         return out
 
 
-    def set_topHero(self, character):
-        """Set the topHero with a given character object."""
-        self.heroes['top'] = character
+    def set_hand(self, hand, side):
+        self.hands[side] = hand
+        hand.side = side
 
 
-    def set_bottomHero(self, character):
-        """Set the bottomHero with a given character object."""
-        self.heroes['bottom'] = character
+    def set_deck(self, deck, side):
+        self.decks[side] = deck
+        deck.side = side
 
 
-    def set_topHand(self, hand):
-        self.hands['top'] = hand
-
-
-    def set_bottomHand(self, hand):
-        self.hands['bottom'] = hand
+    def set_hero(self, character, side):
+        """Set a hero with a given character object."""
+        if self.heroes[side] is not None:
+            raise Exception
+        self.heroes[side] = character
+        character.side = side
+        character.board = self
 
 
     def set_minion(self, character, side, pos=None):
         """Place a minion on the board given the side and (optional) position. If position
         is not specified, place the minion in lowest available spot (not implemented yet)."""
-
-        if self.minions[side][pos] is None:
-            self.minions[side][pos] = character
-            character.side = side
-            character.board = self
-        else:
+        if self.minions[side][pos] is not None:
             raise Exception
+        self.minions[side][pos] = character
+        character.side = side
+        character.board = self
 
 
     def destroy_minion(self, character):

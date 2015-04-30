@@ -3,7 +3,9 @@ from copy import deepcopy
 import os, sys
 
 from Hand import Hand
+from Card import Card
 from Board import Board
+import decks
 import library
 import actions
 
@@ -19,34 +21,45 @@ def create_game():
     board = Board()
 
     # Create the Heros and add to the board
-    board.set_topHero(deepcopy(library.rexar))
-    board.set_bottomHero(deepcopy(library.anduin))
+    board.set_hero(library.create_character('rexar'), 'top')
+    board.set_hero(library.create_character('anduin'), 'bottom')
 
     # Add minions to the board
-    board.set_minion(deepcopy(library.boar), "top", 0)
-    board.set_minion(deepcopy(library.boar), "top", 2)
-    board.set_minion(deepcopy(library.raptor), "bottom", 1)
-    board.set_minion(deepcopy(library.boar), "bottom", 3)
+    board.set_minion(library.create_character('boar'), 'top', 0)
+    board.set_minion(library.create_character('boar'), 'top', 2)
+    board.set_minion(library.create_character('raptor'), 'bottom', 1)
+    board.set_minion(library.create_character('raptor'), 'bottom', 3)
+
+    # Create player decks and shuffle them
+    board.set_deck(decks.create_deck('basic'), 'top')
+    board.set_deck(decks.create_deck('basic'), 'bottom')
+    board.decks['top'].shuffle()
+    board.decks['bottom'].shuffle()
 
     # Create the players hands
-    hand1 = Hand()
-    hand1.add_card(deepcopy(library.boar))
-    hand1.add_card(deepcopy(library.fireball))
-    hand1.add_card(deepcopy(library.raptor))
-    hand2 = Hand()
-    hand2.add_card(deepcopy(library.axe))
-    hand2.add_card(deepcopy(library.coreHound))
-    hand2.add_card(deepcopy(library.raptor))
-    hand2.add_card(deepcopy(library.boar))
+    #hand1.add_card(Card(deepcopy(library.boar)))
+    #hand1.add_card(Card(deepcopy(library.fireball)))
+    #hand1.add_card(Card(deepcopy(library.raptor)))
+    #for i in range(3):
+    #    hand1.cards[i].side = 'top'
+    #    hand1.cards[i].board = board
+    board.set_hand(Hand(), 'top')
 
-    # Add hands to the board
-    board.set_topHand(hand1)
-    board.set_bottomHand(hand2)
+    #hand2.add_card(Card(deepcopy(library.axe)))
+    #hand2.add_card(Card(deepcopy(library.coreHound)))
+    #hand2.add_card(Card(deepcopy(library.raptor)))
+    #hand2.add_card(Card(deepcopy(library.boar)))
+    #for i in range(4):
+    #    hand2.cards[i].side = 'bottom'
+    #    hand2.cards[i].board = board
+    board.set_hand(Hand(), 'bottom')
 
     return board
 
+
 def play_card(board):
     while True:
+        hand = board.hands[board.playerTurn]
         command = ''
         while command not in PLAY_CHOICES:
             refresh(board)
