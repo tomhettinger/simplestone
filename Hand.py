@@ -1,4 +1,4 @@
-HAND_LIMIT = 5
+HAND_LIMIT = 10
 
 class Hand(object):
     """Hand of cards."""
@@ -7,7 +7,7 @@ class Hand(object):
         self.cards = []
         self.size = 0
         self.board = None
-
+        self.CPU = False
 
     def add_card(self, card):
         """A 'card' is either a Spell, Weapon, or Character."""
@@ -21,12 +21,22 @@ class Hand(object):
         self.cards.remove(card)
 
 
+    def is_full(self):
+        return self.size >= HAND_LIMIT
+
+
     def __str__(self):
         if not len(self.cards):
             return "Empty"
         out = ""
-        for card in self.cards:
-            if card.can_play():
-                out += "*"
-            out += "[%d  %s]     " % (card.contents.manaCost, card.contents.name)
-	return out
+
+        if self.CPU:
+            for card in self.cards:
+                out += "[ ??? ]"
+        else:
+            for card in self.cards:
+                if card.can_play():
+                    out += "*"
+                out += "[%d  %s] " % (card.contents.manaCost, card.contents.name)
+
+        return out

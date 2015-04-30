@@ -1,4 +1,6 @@
-MAX_MINIONS = 4
+MAX_MINIONS = 7
+EMPTY_LINE = '{}{:>141}'.format('#', '#\n')
+BORDER_LINE = "{:#>142}".format("\n")
 
 class Board(object):
     """Board class which holds minions on it (4 per side) and Heros."""
@@ -9,56 +11,85 @@ class Board(object):
         self.hands = {'top':None, 'bottom':None}
         self.manaBase = {'top':1, 'bottom':1}
         self.manaCurrent = {'top':1, 'bottom':1} 
-        self.minions = {'top':[None, None, None, None], 'bottom':[None, None, None, None]}
+        self.minions = {'top':[None, None, None, None, None, None, None], 'bottom':[None, None, None, None, None, None, None]}
         self.playerTurn = 'bottom'
         self.turnCount = 1
         self.outputText = ""
 
     def __str__(self):
-        out = "\n\n"
-        out += "{:^100}".format("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-        out += "\n"
-        handOut = "Deck: %d   " % self.decks['top'].size
-        handOut += str(self.hands['top'])
-        manaOut = "Mana: %d/%d" % (self.manaCurrent['top'], self.manaBase['top'])
-        out += "{:<85}{:>15}".format(handOut, manaOut)
-        out += "\n\n"
-        if self.heroes['top'] is None:
-            out += "{:^100}".format("None")
-        else:
-            out += "{:^100}".format(str(self.heroes['top']))
-        out += " \n\n\n\n"
+        # Border
+        out = "\n"
+        out += BORDER_LINE
 
+        # Hand, Deck and Mana 
+        deckOut = "Deck: %d   " % self.decks['top'].size
+        manaOut = "Mana: %d/%d" % (self.manaCurrent['top'], self.manaBase['top'])
+        out += "{}{:>137}{}".format('# ', deckOut+manaOut, ' #\n')
+        handOut = str(self.hands['top'])
+        out += "{}{:<137}{}".format('# ', handOut, ' #\n')
+        out += EMPTY_LINE
+        out += EMPTY_LINE
+
+        # Hero
+        if self.heroes['top'] is None:
+            out += "{}{:^137}{}".format('# ', "None", ' #\n')
+        else:
+            out += "{}{:^137}{}".format('# ', str(self.heroes['top']), ' #\n')
+        out += EMPTY_LINE
+        out += EMPTY_LINE
+        out += EMPTY_LINE
+        out += EMPTY_LINE
+        out += EMPTY_LINE
+
+        # Minions
         minionOut = []
         for m in self.minions['top']:
             if m is None:
                 minionOut.append("____")
             else:
                 minionOut.append(str(m))
-        out += "{:^25}{:^25}{:^25}{:^25}".format(*minionOut)
-        out += "\n\n"
+        minOut = ['# ',]
+        minOut.extend(minionOut)
+        minOut.extend([' #\n'])
+        out += "{:<4}{:^19}{:^19}{:^19}{:^19}{:^19}{:^19}{:^19}{:>5}".format(*minOut)
+        out += EMPTY_LINE
+        out += EMPTY_LINE
+        out += EMPTY_LINE
+        out += EMPTY_LINE
         minionOut = []
         for m in self.minions['bottom']:
             if m is None:
                 minionOut.append("____")
             else:
                 minionOut.append(str(m))
-        out += "{:^25}{:^25}{:^25}{:^25}".format(*minionOut)
-        out += "\n\n\n\n"
+        minOut = ['# ',]
+        minOut.extend(minionOut)
+        minOut.extend([' #\n'])
+        out += "{:<4}{:^19}{:^19}{:^19}{:^19}{:^19}{:^19}{:^19}{:>5}".format(*minOut)
+        out += EMPTY_LINE
+        out += EMPTY_LINE
+        out += EMPTY_LINE
+        out += EMPTY_LINE
+        out += EMPTY_LINE
 
+        # Hero
         if self.heroes['bottom'] is None:
-            out += "{:^100}".format("None")
+            out += "{}{:^137}{}".format('#', "None", ' #\n')
         else:
-            out += "{:^100}".format(str(self.heroes['bottom']))
-        out += "\n\n"
-        handOut = "Deck: %d   " % self.decks['bottom'].size
-        handOut += str(self.hands['bottom'])
+            out += "{}{:^137}{}".format('# ', str(self.heroes['bottom']), ' #\n')
+        out += EMPTY_LINE
+        out += EMPTY_LINE
+
+        # Hand, Deck and Mana 
+        handOut = str(self.hands['bottom'])
+        out += "{}{:<137}{}".format('# ', handOut, ' #\n')
+        deckOut = "Deck: %d   " % self.decks['bottom'].size
         manaOut = "Mana: %d/%d" % (self.manaCurrent['bottom'], self.manaBase['bottom'])
-        out += "{:<85}{:>15}".format(handOut, manaOut)
-        out += "\n"
-        out += "{:^100}".format("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-        out += "\n"
-        out += "{:<100}".format(self.outputText)
+        out += "{}{:>137}{}".format('# ', deckOut+manaOut, ' #\n')
+
+        # Border
+        out += BORDER_LINE
+        out += "{:<140}".format(self.outputText)
         out += "\n"
 
         return out

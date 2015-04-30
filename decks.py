@@ -1,5 +1,4 @@
-"""
-Define custom made decks here.
+"""Define custom made decks here.
 """
 from Deck import Deck
 import library

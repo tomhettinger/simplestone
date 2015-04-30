@@ -12,8 +12,11 @@ class Deck(object):
 
 
     def draw_card(self):
-        self.size -= 1
-        return self.cards.pop()
+        if self.size <= 0:
+            return None
+        else:
+            self.size -= 1
+            return self.cards.pop()
 
 
     def shuffle(self):

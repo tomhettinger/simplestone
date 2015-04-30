@@ -1,4 +1,5 @@
-"""Set of actions that can be done by the players (or other)."""
+"""Set of actions that can happen.
+"""
 
 def minion_attack(board, attacker, defender):
     """Attack the defender with attacker."""
@@ -12,11 +13,22 @@ def minion_attack(board, attacker, defender):
         board.destroy_minion(attacker)
 
 
-def draw_card(deck, hand):
+def draw_card(board, side):
     """Draw the top card from the deck and place it into the hand."""
+    deck = board.decks[side]
+    hand = board.hands[side]
     cardDrawn = deck.draw_card()
-    hand.add_card(cardDrawn)
-    cardDrawn.hand = hand
+
+    # If deck is empty, deal fatigue damage.
+    if cardDrawn is None:
+        deal_fatigue(board.heroes[side])
+        return
+
+    if hand.is_full():
+        board.outputText = "Hand is full, burning:  %s" % cardDrawn.contents.name
+    else:
+        hand.add_card(cardDrawn)
+        cardDrawn.hand = hand
 
 
 def play_minion(board, side, character, pos):
@@ -29,6 +41,14 @@ def play_minion(board, side, character, pos):
     board.manaCurrent[side] -= character.manaCost
     board.set_minion(character, side, pos)
     character.battlecry()
+
+
+def deal_fatigue(hero):
+    """Deal fatigue damage to a hero."""
+    # Deal the damage, then increase the fatigue counter.
+    hero.currentHealth -= hero.fatigueDMG
+    hero.board.outputText = "Hero takes %d fatigue damage." % hero.fatigueDMG
+    hero.fatigueDMG += 1
 
 
 def deal_damage(board, side, pos, damage):
