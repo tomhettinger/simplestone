@@ -2,7 +2,7 @@
 
 def minion_attack(board, attacker, defender):
     """Attack the defender with attacker."""
-    print "%s attacks %s." % (attacker.name, defender.name)
+    board.outputText = "%s attacks %s." % (attacker.name, defender.name)
     defender.currentHealth -= attacker.currentAttack
     attacker.currentHealth -= defender.currentAttack
     attacker.attacksRemaining -= 1
@@ -10,6 +10,13 @@ def minion_attack(board, attacker, defender):
         board.destroy_minion(defender)
     if attacker.currentHealth <= 0:
         board.destroy_minion(attacker)
+
+
+def draw_card(deck, hand):
+    """Draw the top card from the deck and place it into the hand."""
+    cardDrawn = deck.draw_card()
+    hand.add_card(cardDrawn)
+    cardDrawn.hand = hand
 
 
 def play_minion(board, side, character, pos):

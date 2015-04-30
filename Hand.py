@@ -6,6 +6,8 @@ class Hand(object):
         self.side = None
         self.cards = []
         self.size = 0
+        self.board = None
+
 
     def add_card(self, card):
         """A 'card' is either a Spell, Weapon, or Character."""
@@ -13,6 +15,11 @@ class Hand(object):
             raise Exception("Too many Cards.")
         self.cards.append(card)
         self.size += 1
+
+
+    def remove_card(self, card):
+        self.cards.remove(card)
+
 
     def __str__(self):
         if not len(self.cards):

@@ -12,12 +12,14 @@ class Board(object):
         self.minions = {'top':[None, None, None, None], 'bottom':[None, None, None, None]}
         self.playerTurn = 'bottom'
         self.turnCount = 1
+        self.outputText = ""
 
     def __str__(self):
         out = "\n\n"
         out += "{:^100}".format("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
         out += "\n"
-        handOut = str(self.hands['top'])
+        handOut = "Deck: %d   " % self.decks['top'].size
+        handOut += str(self.hands['top'])
         manaOut = "Mana: %d/%d" % (self.manaCurrent['top'], self.manaBase['top'])
         out += "{:<85}{:>15}".format(handOut, manaOut)
         out += "\n\n"
@@ -49,11 +51,14 @@ class Board(object):
         else:
             out += "{:^100}".format(str(self.heroes['bottom']))
         out += "\n\n"
-        handOut = str(self.hands['bottom'])
+        handOut = "Deck: %d   " % self.decks['bottom'].size
+        handOut += str(self.hands['bottom'])
         manaOut = "Mana: %d/%d" % (self.manaCurrent['bottom'], self.manaBase['bottom'])
         out += "{:<85}{:>15}".format(handOut, manaOut)
         out += "\n"
         out += "{:^100}".format("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+        out += "\n"
+        out += "{:<100}".format(self.outputText)
         out += "\n"
 
         return out
@@ -62,6 +67,7 @@ class Board(object):
     def set_hand(self, hand, side):
         self.hands[side] = hand
         hand.side = side
+        hand.board = self
 
 
     def set_deck(self, deck, side):

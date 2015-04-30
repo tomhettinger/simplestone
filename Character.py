@@ -21,12 +21,12 @@ class Character(object):
 
 
     def deathrattle(self):
-        print "%s destroyed. DEATHRATTLE." % self.name
-
+        self.board.outputText = "%s destroyed. DEATHRATTLE." % self.name
+        # Execute deathrattle here.
 
     def battlecry(self):
-        print "%s is played from the hand. BATTLECRY." % self.name
-
+        self.board.outputText = "%s is played from the hand. BATTLECRY." % self.name
+        # Execute battlecry here.
 
     def can_attack(self):
         return (self.attacksRemaining > 0) and ('frozen' not in self.status) and (self.currentAttack > 0) and (self.side == self.board.playerTurn)
@@ -42,3 +42,10 @@ class Hero(Character):
     """Hero class inherits character class."""
     def __init__(self, name="Default Hero", baseAttack=0, baseHealth=30, manaCost=0):
         super(Hero, self).__init__(name, baseAttack, baseHealth, manaCost)
+
+
+    def __str__(self):
+        out = "{%d  %s  %d}" % (self.currentAttack, self.name, self.currentHealth)
+        if self.can_attack():
+            out = "*" + out
+        return out
