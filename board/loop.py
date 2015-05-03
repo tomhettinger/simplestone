@@ -106,18 +106,27 @@ def refresh(board):
     print out
 
 
-def play_loop(board):
+def check_if_game_over(board):
+    """End the game if a hero is dead."""
+    if (board.get_hero(side='top').currentHealth <= 0):
+        print "\n\nBottom player wins.  Thank you for playing."
+        sys.exit()
+    elif (board.get_hero(side='bottom').currentHealth <= 0):
+        print "\n\nTop player wins.  Thank you for playing."
+        sys.exit()
+
+
+def play_loop(board, ai=None):
     """The highest level of the loop.  Allow player to decide what actions to take, or end the turn."""
     while True:
         refresh(board)
+        check_if_game_over(board)
 
-        # Check if either hero is dead.
-        if (board.get_hero(side='top').currentHealth <= 0):
-            print "\n\nBottom player wins.  Thank you for playing."
-            sys.exit()
-        elif (board.get_hero(side='bottom').currentHealth <= 0):
-            print "\n\nTop player wins.  Thank you for playing."
-            sys.exit()
+        # If enemy turn, let the AI play.
+        if board.get_side() == "top" and ai is not None:
+            board.set_text("AI turn.")
+            ai.play_turn()
+            continue
 
         # Ask for instructions
         command = None
@@ -327,6 +336,8 @@ def select_target(board, attacker):
 def end_turn(board):
     """End the turn and take necessary actions."""
     # Do stuff here, like end of turn effects.
+    # Check if either hero is dead.
+    check_if_game_over(board)
     begin_turn(board)
 
 

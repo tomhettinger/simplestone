@@ -1,13 +1,16 @@
 #!/usr/bin/env python
 """ Creates the board and runs the game. Created by Thomas Hettinger.
 """
-from Hand import Hand
-from Card import Card
-from Board import Board
-import decks
-import library
-import actions
-import loop
+from board.Hand import Hand
+from board.Card import Card
+from board.Board import Board
+import board.actions as actions
+import board.loop as loop
+
+import data.decks as decks
+import data.library as library
+
+from ai.AI import AI
 
 
 def create_game():

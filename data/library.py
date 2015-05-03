@@ -2,10 +2,10 @@
 """
 from copy import deepcopy
 
-from Character import Hero, Minion
-from Weapon import Weapon
-from Spell import Spell
-from Card import Card
+from board.Character import Hero, Minion
+from board.Weapon import Weapon
+from board.Spell import Spell
+from board.Card import Card
 
 heroes = {}
 minions = {}
