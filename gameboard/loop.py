@@ -125,7 +125,7 @@ def play_loop(board, ai=None):
         # If enemy turn, let the AI play.
         if board.get_side() == "top" and ai is not None:
             board.set_text("AI turn.")
-            ai.play_turn()
+            ai.play_turn(board)
             continue
 
         # Ask for instructions

@@ -3,7 +3,7 @@
 
 def minion_attack(board, attacker, defender):
     """Attack the defender with attacker."""
-    board.outputText = "%s attacks %s." % (attacker.name, defender.name)
+    board.set_text("%s attacks %s." % (attacker.name, defender.name))
     defender.currentHealth -= attacker.currentAttack
     attacker.currentHealth -= defender.currentAttack
     attacker.attacksRemaining -= 1
@@ -25,7 +25,7 @@ def draw_card(board, side):
         return
 
     if hand.is_full():
-        board.outputText = "Hand is full, burning:  %s" % cardDrawn.contents.name
+        board.set_text("Hand is full, burning:  %s" % cardDrawn.contents.name)
     else:
         hand.add_card(cardDrawn)
 
@@ -46,7 +46,7 @@ def deal_fatigue(hero):
     """Deal fatigue damage to a hero."""
     # Deal the damage, then increase the fatigue counter.
     hero.currentHealth -= hero.fatigueDMG
-    hero.board.outputText = "Hero takes %d fatigue damage." % hero.fatigueDMG
+    hero.board.set_text("Hero takes %d fatigue damage." % hero.fatigueDMG)
     hero.fatigueDMG += 1
 
 

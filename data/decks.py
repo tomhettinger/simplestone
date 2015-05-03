@@ -1,6 +1,6 @@
 """Define custom made decks here.
 """
-from board.Deck import Deck
+from gameboard.Deck import Deck
 import library
 
 deckContents = {}

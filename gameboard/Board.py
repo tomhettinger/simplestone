@@ -122,6 +122,20 @@ class Board(object):
         return emptyPositions
 
 
+    def get_canAttack_characters(self):
+        """Return a list of characters that can attack right now."""
+        side = self.playerTurn
+        canAttackChars = []
+        for minion in self.minions[side]:
+            if minion is None:
+                continue
+            if minion.can_attack():
+                canAttackChars.append(minion)
+        if self.heroes[side].can_attack():
+            canAttackChars.append(self.heroes[side])
+        return canAttackChars
+
+
     def get_canAttack_char_positions(self):
         """Return a list of positions of characters that can attack right now."""
         side = self.playerTurn
