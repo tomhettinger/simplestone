@@ -9,6 +9,9 @@ from Character import Character
 from Weapon import Weapon
 from Spell import Spell
 
+EMPTY_LINE = '{}{:>141}'.format('#', '#\n')
+BORDER_LINE = "{:#>142}".format("\n")
+
 
 def enemy(side):
     """Return the side opposite of the given side."""
@@ -23,7 +26,84 @@ def enemy(side):
 def refresh(board):
     """Clear the board and redraw it."""
     os.system('clear')
-    print board
+    #print board
+
+    # Border
+    out = "\n"
+    out += BORDER_LINE
+
+    # Hand, Deck and Mana 
+    deckOut = "Deck: %d   " % board.decks['top'].size
+    manaOut = "Mana: {%d/%d}" % (board.manaCurrent['top'], board.manaBase['top'])
+    out += "{}{:>137}{}".format('# ', deckOut+manaOut, ' #\n')
+    handOut = str(board.hands['top'])
+    out += "{}{:<137}{}".format('# ', handOut, ' #\n')
+    out += EMPTY_LINE
+    out += EMPTY_LINE
+
+    # Hero
+    if board.heroes['top'] is None:
+        out += "{}{:^137}{}".format('# ', "None", ' #\n')
+    else:
+        out += "{}{:^137}{}".format('# ', str(board.heroes['top']), ' #\n')
+    out += EMPTY_LINE
+    out += EMPTY_LINE
+    out += EMPTY_LINE
+    out += EMPTY_LINE
+    out += EMPTY_LINE
+
+    # Minions
+    minionOut = []
+    for m in board.minions['top']:
+        if m is None:
+            minionOut.append("____")
+        else:
+            minionOut.append(str(m))
+    minOut = ['# ',]
+    minOut.extend(minionOut)
+    minOut.extend([' #\n'])
+    out += "{:<4}{:^19}{:^19}{:^19}{:^19}{:^19}{:^19}{:^19}{:>5}".format(*minOut)
+    out += EMPTY_LINE
+    out += EMPTY_LINE
+    out += EMPTY_LINE
+    out += EMPTY_LINE
+    minionOut = []
+    for m in board.minions['bottom']:
+        if m is None:
+            minionOut.append("____")
+        else:
+            minionOut.append(str(m))
+    minOut = ['# ',]
+    minOut.extend(minionOut)
+    minOut.extend([' #\n'])
+    out += "{:<4}{:^19}{:^19}{:^19}{:^19}{:^19}{:^19}{:^19}{:>5}".format(*minOut)
+    out += EMPTY_LINE
+    out += EMPTY_LINE
+    out += EMPTY_LINE
+    out += EMPTY_LINE
+    out += EMPTY_LINE
+
+    # Hero
+    if board.heroes['bottom'] is None:
+        out += "{}{:^137}{}".format('#', "None", ' #\n')
+    else:
+        out += "{}{:^137}{}".format('# ', str(board.heroes['bottom']), ' #\n')
+    out += EMPTY_LINE
+    out += EMPTY_LINE
+
+    # Hand, Deck and Mana 
+    handOut = str(board.hands['bottom'])
+    out += "{}{:<137}{}".format('# ', handOut, ' #\n')
+    deckOut = "Deck: %d   " % board.decks['bottom'].size
+    manaOut = "Mana: {%d/%d}" % (board.manaCurrent['bottom'], board.manaBase['bottom'])
+    out += "{}{:>137}{}".format('# ', deckOut+manaOut, ' #\n')
+
+    # Border
+    out += BORDER_LINE
+    out += "{:<140}".format(board.get_text())
+    out += "\n"
+
+    print out
 
 
 def play_loop(board):
@@ -32,17 +112,20 @@ def play_loop(board):
         refresh(board)
 
         # Check if either hero is dead.
-        if (board.heroes['top'].currentHealth <= 0):
+        if (board.get_hero(side='top').currentHealth <= 0):
             print "\n\nBottom player wins.  Thank you for playing."
             sys.exit()
-        elif (board.heroes['top'].currentHealth <= 0):
+        elif (board.get_hero(side='bottom').currentHealth <= 0):
             print "\n\nTop player wins.  Thank you for playing."
             sys.exit()
 
-        command = ''
+        # Ask for instructions
+        command = None
         while command not in ['p', 'a', 'h', 'e', 'q']:
             refresh(board)  
             command = raw_input("{:^100}".format("[p] Play Card   [a] Attack w/ Char   [h] Hero Power   [e] End Turn   [q] Quit\n"))
+
+        # Execute insructions
         if command == 'q':
             sys.exit()
         elif command == 'p':
@@ -54,34 +137,32 @@ def play_loop(board):
         elif command == 'h':
             continue
         elif command == 'e':
-            advance_turn(board)
+            end_turn(board)
+            continue
 
 
 def play_card(board):
     """Spend mana to play a card."""
     while True:
-        hand = board.hands[board.playerTurn]
+        hand = board.get_hand()
 
         # Check if there are any cards to play.
-        playableCards = []
-        for i, card in enumerate(hand.cards):
-            if card.can_play():
-                 playableCards.append(i)
-        if not len(playableCards):
-            board.outputText = "No cards to play."
+        playableCardPos = hand.get_playable_card_positions()
+        if not len(playableCardPos):
+            board.set_text("No cards to play.")
             break
 
         # Give options and request instructions
         play_choices = ['b', 'q']
-        play_choices.extend([str(x+1) for x in playableCards])
-        command = ''
+        play_choices.extend([str(x) for x in playableCardPos])
+        command = None
         while command not in play_choices:
-            board.outputText = "Select a card:"
+            board.set_text("Select a card:")
             refresh(board)
             outLine = ""
-            for i in playableCards:
-                outLine += "[%d] %s   " % ((i+1), hand.cards[i].name)
-            outLine += "[b] Back   [q] Quit\n"
+            for i in playableCardPos:
+                outLine += "<%d> %s   " % (i, hand.cards[i-1].name)
+            outLine += "<b> Back   <q> Quit\n"
             command = raw_input("{:^100}".format(outLine))
 
         # Execute instruction
@@ -90,9 +171,9 @@ def play_card(board):
         elif command == 'b':
             break
         else:
-            idx = int(command) - 1
-            cardToPlay = hand.cards[idx]
-            board.outputText = 'Playing %s' % cardToPlay.name
+            pos = int(command)
+            cardToPlay = hand.get_card(pos)
+            board.set_text('Playing %s' % cardToPlay.name)
             if isinstance(cardToPlay.contents, Character):
                 play_character_from_hand(board, cardToPlay)
             elif isinstance(cardToPlay.contents, Spell):
@@ -107,28 +188,23 @@ def play_card(board):
 def play_character_from_hand(board, cardToPlay):
     while True:
         """Try to play a minion from the hand.  Doing so causes a battlecry."""
-        # Check if there is room to place the minion.
-        side = board.playerTurn
-        minions = copy(board.minions[side])
-        playablePos = []
-        for i, minion in enumerate(minions):
-            if minion is None:
-                playablePos.append(i)
-        if not len(playablePos):
-            board.outputText = "Not enough room for more minions."
+        # Check if there is room to place the minion.        
+        emptyMinionPos = board.get_empty_minion_positions()
+        if not len(emptyMinionPos):
+            board.set_text("Not enough room for more minions.")
             break
 
         # Give the available positions to drop minion and request instructions.
         play_choices = ['b', 'q']
-        play_choices.extend([str(x+1) for x in playablePos])
-        command = ''
+        play_choices.extend([str(x) for x in emptyMinionPos])
+        command = None
         while command not in play_choices:
-            board.outputText = "Select a position to place minion:"
+            board.set_text("Select a position to place minion:")
             refresh(board)
             outLine = ""
-            for i in playablePos:
-                outLine += "[%d]   " % (i+1)
-            outLine += "[b] Back   [q] Quit\n"
+            for i in emptyMinionPos:
+                outLine += "<%d>   " % i
+            outLine += "<b> Back   <q> Quit\n"
             command = raw_input("{:^100}".format(outLine))
 
         # Execute instructions
@@ -137,17 +213,14 @@ def play_character_from_hand(board, cardToPlay):
         elif command == 'b':
             break
         else:
-            idx = int(command) - 1
+            pos = int(command)
             minion = cardToPlay.contents
             # Place minion, excecute the battlecry, remove attack, remove from hand, reduce player mana.
             minion.board = board
             minion.battlecry()
-            if "charge" not in minion.status:
-                minion.attacksRemaining = 0
-            print minion.status
-            board.set_minion(minion, side, idx)
-            board.hands[side].remove_card(cardToPlay)
-            board.manaCurrent[side] -= minion.manaCost
+            board.subtract_mana(minion.manaCost)
+            board.get_hand().remove_card(cardToPlay)
+            board.summon_minion(minion, board.get_side(), pos)
             break
 
 
@@ -156,7 +229,7 @@ def play_weapon_from_hand(board, cardToPlay):
     side = board.playerTurn
     weapon = cardToPlay.contents
     # Equip Weapon
-    board.outputText = "Equipping %s. (Not implemented yet)." % weapon.name
+    board.set_text("Equipping %s. (Not implemented yet)." % weapon.name)
     # Remove from hand and reduce players mana.
     board.hands[side].remove_card(cardToPlay)
     board.manaCurrent[side] -= weapon.manaCost
@@ -164,45 +237,37 @@ def play_weapon_from_hand(board, cardToPlay):
 
 def play_spell_from_hand(board, cardToPlay):
     """Cast a spell."""
-    side = board.playerTurn
     spell = cardToPlay.contents
     # Cast spell
-    board.outputText = "Casting %s. (Not implemented yet)." % spell.name
+    board.set_text("Casting %s. (Not implemented yet, except The Coin)." % spell.name)
+    if spell.name == 'The Coin':
+        board.add_mana(1)
     # Remove from hand and reduce players mana.
-    board.hands[side].remove_card(cardToPlay)
-    board.manaCurrent[side] -= spell.manaCost
-
+    board.subtract_mana(spell.manaCost)
+    board.get_hand().remove_card(cardToPlay)
+    
 
 def select_attacker(board):
     """Select a minion to use to do some attacking.  If valid attacker and defender are choosen,
     perform the attack."""
     while True:
-        side = board.playerTurn
-        chars = copy(board.minions[side])
-        chars.append(board.heroes[side])
-
         # Check if there are any characters that can attack.
-        playableChars = []
-        for i, char in enumerate(chars):
-            if char is None:
-                continue
-            if char.can_attack():
-                playableChars.append(i)
-        if not len(playableChars):
-            board.outputText = "No characters can attack."
+        canAttackPos = board.get_canAttack_char_positions()
+        if not len(canAttackPos):
+            board.set_text("No characters can attack.")
             break
 
         # Give options for attacker and ask for instructions.
         play_choices = ['b', 'q']
-        play_choices.extend([str(x+1) for x in playableChars])
-        command = ''
+        play_choices.extend([str(x) for x in canAttackPos])
+        command = None
         while command not in play_choices:
-            board.outputText = "Select a character to attack with:"
+            board.set_text("Select a character to attack with:")
             refresh(board)
             outLine = ""
-            for i in playableChars:
-                outLine += "[%d] %s   " % ((i+1), chars[i].name)
-            outLine += "[b] Back   [q] Quit\n"
+            for i in canAttackPos:
+                outLine += "<%d> %s   " % (i, board.get_character(i).name)
+            outLine += "<b> Back   [q] Quit\n"
             command = raw_input("{:^100}".format(outLine))
 
         # Execute instructions
@@ -211,8 +276,8 @@ def select_attacker(board):
         elif command == 'b':
             break
         else:
-            idx = int(command) - 1
-            attacker = chars[idx]
+            pos = int(command)
+            attacker = board.get_character(pos)
             defender = select_target(board, attacker)
             if defender is None:
                 break
@@ -224,31 +289,28 @@ def select_target(board, attacker):
     """Currently, a player can only attack an enemy.  To change this, check the attackers targeting
     powers and cross-check that with every characters side attribute."""
     while True:
-        side = enemy(board.playerTurn)
-
         # Check if there are any enemies to attack.
-        chars = copy(board.minions[side])
-        chars.append(board.heroes[side])
-        attackableChars = []
-        for i, char in enumerate(chars):
-            if char is None:
-                continue
-            attackableChars.append(i)
-        if not len(attackableChars):
-            board.outputText = "No characters to attack."
+        attackableCharacters = board.get_targetable_characters(attacker)
+        for character in attackableCharacters:
+            print character.name
+        if not len(attackableCharacters):
+            board.set_text("No characters to attack.")
             return None
+        attackableCharacters.sort(key=lambda char: int(board.get_target_pos(char)))
 
         # Give available choices and ask for instructions.
         play_choices = ['b', 'q']
-        play_choices.extend([str(x+1) for x in attackableChars])
-        command = ''
+        for char in attackableCharacters:
+            play_choices.append(str(board.get_target_pos(char)))
+        command = None
         while command not in play_choices:
-            board.outputText = "Select an enemy to attack:"
+            board.set_text("Select an enemy to attack:")
             refresh(board)
             outLine = ""
-            for i in attackableChars:
-                outLine += "[%d] %s   " % ((i+1), chars[i].name)
-            outLine += "[b] Back   [q] Quit\n"
+            for char in attackableCharacters:
+                pos = board.get_target_pos(char)
+                outLine += "<%d> %s   " % (pos, char.name)
+            outLine += "<b> Back   <q> Quit\n"
             command = raw_input("{:^100}".format(outLine))
 
         # Execute instructions.
@@ -257,36 +319,29 @@ def select_target(board, attacker):
         elif command == 'b':
             return None
         else:
-            idx = int(command) - 1
-            target = chars[idx]
+            pos = int(command)
+            target = board.get_character_by_position(pos)
             return target
 
 
-def advance_turn(board):
-    """Move to the next players turn."""
+def end_turn(board):
+    """End the turn and take necessary actions."""
+    # Do stuff here, like end of turn effects.
+    begin_turn(board)
+
+
+def begin_turn(board):
+    """Begin the turn and take necessary actions."""
     # Increase counter and switch sides.
-    board.outputText = ""
-    board.turnCount += 1
-    newSide = enemy(board.playerTurn)
-    board.playerTurn = newSide
+    board.set_text("")
+    board.increment_turn()
+    board.change_side()
 
     # Add mana crystal and reset mana count to full.
-    if board.manaBase[newSide] < 10:
-        board.manaBase[newSide] += 1
-    board.manaCurrent[newSide] = board.manaBase[newSide]
-
-    # Draw a card.
-    actions.draw_card(board, newSide)
+    board.update_mana()
 
     # Reset the attacks of characters on this side.
-    for minion in board.minions[newSide]:
-        if minion is None:
-            continue
-        minion.attacksRemaining = 1
-        if 'windfury' in minion.status:
-            minion.attacksRemaining += 1
-    hero = board.heroes[newSide]
-    hero.attacksRemaining = 1
-    if 'windfury' in hero.status:
-        hero.attacksRemaining += 1
+    board.reset_attacksRemaining()
 
+    # Draw a card.
+    actions.draw_card(board, board.get_side())

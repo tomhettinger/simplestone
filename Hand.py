@@ -9,13 +9,28 @@ class Hand(object):
         self.board = None
         self.CPU = False
 
+
+    def get_card(self, pos):
+        """Return the card at the pos (idx+1) specified."""
+        return self.cards[pos-1]
+
+
+    def get_playable_card_positions(self):
+        """Reutn the position (idx+1) of the cards that can be played."""
+        playableCardPos = []
+        for i, card in enumerate(self.cards):
+            if card.can_play():
+                 playableCardPos.append(i+1)
+        return playableCardPos
+
+
     def add_card(self, card):
         """A 'card' is either a Spell, Weapon, or Character."""
         if len(self.cards) >= HAND_LIMIT:
             raise Exception("Too many Cards.")
         self.cards.append(card)
         self.size += 1
-
+        card.hand = self
 
     def remove_card(self, card):
         self.cards.remove(card)
@@ -32,11 +47,11 @@ class Hand(object):
 
         if self.CPU:
             for card in self.cards:
-                out += "[ ??? ]"
+                out += "| ??? |"
         else:
             for card in self.cards:
                 if card.can_play():
                     out += "*"
-                out += "[%d  %s] " % (card.contents.manaCost, card.contents.name)
+                out += "|{%d} %s|  " % (card.contents.manaCost, card.contents.name)
 
         return out

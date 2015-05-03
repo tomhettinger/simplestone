@@ -28,7 +28,6 @@ def draw_card(board, side):
         board.outputText = "Hand is full, burning:  %s" % cardDrawn.contents.name
     else:
         hand.add_card(cardDrawn)
-        cardDrawn.hand = hand
 
 
 def play_minion(board, side, character, pos):
@@ -39,7 +38,7 @@ def play_minion(board, side, character, pos):
     if minions[pos] is not None:
         raise Exception("%s already on this spot." % minions[pos].name)
     board.manaCurrent[side] -= character.manaCost
-    board.set_minion(character, side, pos)
+    board.summon_minion(character, side, pos)
     character.battlecry()
 
 

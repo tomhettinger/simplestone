@@ -19,10 +19,10 @@ def create_game():
     board.set_hero(library.create_character('anduin'), 'bottom')
 
     # Add minions to the board
-    board.set_minion(library.create_character('boar'), 'top', 0)
-    board.set_minion(library.create_character('boar'), 'top', 2)
-    board.set_minion(library.create_character('raptor'), 'bottom', 1)
-    board.set_minion(library.create_character('raptor'), 'bottom', 3)
+    board.summon_minion(library.create_character('boar'), 'top', 1)
+    board.summon_minion(library.create_character('boar'), 'top', 3)
+    board.summon_minion(library.create_character('raptor'), 'bottom', 2)
+    board.summon_minion(library.create_character('raptor'), 'bottom', 4)
 
     # Create player decks and shuffle them
     board.set_deck(decks.create_deck('basic'), 'top')
@@ -30,13 +30,14 @@ def create_game():
     board.decks['top'].shuffle()
     board.decks['bottom'].shuffle()
 
-    # Create the players hands
+    # Create the player's hands
     board.set_hand(Hand(), 'top')
     board.hands['top'].CPU = True
+    board.hands['top'].add_card(library.create_card('theCoin'))
     board.set_hand(Hand(), 'bottom')
 
     # Draw three cards
-    for i in range(3):
+    for i in range(4):
         actions.draw_card(board, 'top')
         actions.draw_card(board, 'bottom')
 

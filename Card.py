@@ -5,11 +5,13 @@ class Card(object):
         if contents is not None:
             self.name = contents.name
 
+
     def can_play(self):
-        playerTurn = self.hand.board.playerTurn
-        availMana = self.hand.board.manaCurrent[playerTurn]
+        side = self.hand.board.playerTurn
+        availMana = self.hand.board.manaCurrent[side]
         cost = self.contents.manaCost
-        return (self.hand.side == playerTurn) and (cost <= availMana)
+        return (self.hand.side == self.hand.board.get_side()) and (cost <= availMana)
+
 
     def set_contents(self, contents):
         """Set the contents of a card (weapon, spell, minion)."""

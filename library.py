@@ -70,6 +70,7 @@ weapons['axe'] = Weapon("Axe", 4, 1, 3)
 fireball = Spell("Fireball", 4)
 fireball.set_effect(spellType="DealDmg", target="anyEnemeyMinion", value=6)
 spells['fireball'] = fireball
+spells['theCoin'] = Spell("The Coin", 0)
 
 
 def create_card(name):
