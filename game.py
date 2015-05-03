@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-""" Creates the board and runs the game.
+""" Creates the board and runs the game. Created by Thomas Hettinger.
 """
 from Hand import Hand
 from Card import Card
