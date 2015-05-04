@@ -118,7 +118,7 @@ def check_if_game_over(board):
         sys.exit()
 
 
-def play_loop(board, ai=None):
+def play_loop(board, ai=None, ai2=None):
     """The highest level of the loop.  Allow player to decide what actions to take, or end the turn."""
     while True:
         refresh(board)
@@ -128,6 +128,11 @@ def play_loop(board, ai=None):
         if board.get_side() == "top" and ai is not None:
             board.set_text("AI turn.")
             ai.play_turn(board)
+            continue
+
+        if board.get_side() == "bottom" and ai2 is not None:
+            board.set_text("AI_2 turn.")
+            ai2.play_turn(board)
             continue
 
         # Ask for instructions

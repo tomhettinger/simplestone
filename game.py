@@ -56,9 +56,18 @@ def main(*args):
         debug = True
     else:
         debug = False
-    board = create_game(debug=debug)
-    ai = AI()
-    loop.play_loop(board, ai)
+    
+
+    board = create_game(debug=debug)    
+    if 'vs' in args[0]:
+        loop.play_loop(board)
+    elif 'cpu' in args[0]:
+        ai = AI()
+        ai2 = AI()
+        loop.play_loop(board, ai, ai2)
+    else:
+        ai = AI()
+        loop.play_loop(board, ai)
 
 
 if __name__ == "__main__":
