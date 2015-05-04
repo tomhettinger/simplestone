@@ -7,7 +7,7 @@ class Hand(object):
         self.cards = []
         self.size = 0
         self.board = None
-        self.CPU = False
+        self.hidden = False
 
 
     def get_card(self, pos):
@@ -54,7 +54,7 @@ class Hand(object):
             return "Empty"
         out = ""
 
-        if self.CPU:
+        if self.hidden:
             for card in self.cards:
                 out += "| ??? |"
         else:

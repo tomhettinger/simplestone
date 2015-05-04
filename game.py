@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 """ Creates the board and runs the game. Created by Thomas Hettinger.
 """
+import sys
+
 from gameboard.Hand import Hand
 from gameboard.Card import Card
 from gameboard.Board import Board
@@ -13,7 +15,7 @@ import data.library as library
 from ai.AI import AI
 
 
-def create_game():
+def create_game(debug=False):
     # Create the board
     board = Board()
 
@@ -21,11 +23,12 @@ def create_game():
     board.set_hero(library.create_character('rexar'), 'top')
     board.set_hero(library.create_character('anduin'), 'bottom')
 
-    # Add minions to the board
-    board.summon_minion(library.create_character('boar'), 'top', 1)
-    board.summon_minion(library.create_character('boar'), 'top', 3)
-    board.summon_minion(library.create_character('raptor'), 'bottom', 2)
-    board.summon_minion(library.create_character('raptor'), 'bottom', 4)
+    if debug:
+        # Add minions to the board
+        board.summon_minion(library.create_character('boar'), 'top', 1)
+        board.summon_minion(library.create_character('boar'), 'top', 3)
+        board.summon_minion(library.create_character('raptor'), 'bottom', 2)
+        board.summon_minion(library.create_character('raptor'), 'bottom', 4)
 
     # Create player decks and shuffle them
     board.set_deck(decks.create_deck('basic'), 'top')
@@ -35,7 +38,8 @@ def create_game():
 
     # Create the player's hands
     board.set_hand(Hand(), 'top')
-    board.hands['top'].CPU = True
+    if not debug:
+        board.hands['top'].hidden = True
     board.hands['top'].add_card(library.create_card('theCoin'))
     board.set_hand(Hand(), 'bottom')
 
@@ -47,11 +51,15 @@ def create_game():
     return board
 
 
-def main():
-    board = create_game()
+def main(*args):
+    if 'debug' in args[0]:
+        debug = True
+    else:
+        debug = False
+    board = create_game(debug=debug)
     ai = AI()
     loop.play_loop(board, ai)
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv)
