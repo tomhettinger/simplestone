@@ -56,9 +56,9 @@ def refresh(board):
     minionOut = []
     for m in board.minions['top']:
         if m is None:
-            minionOut.append("____")
+            minionOut.append("__")
         else:
-            minionOut.append(str(m))
+            minionOut.append(' ' + str(m) + ' ')
     minOut = ['# ',]
     minOut.extend(minionOut)
     minOut.extend([' #\n'])
@@ -70,9 +70,9 @@ def refresh(board):
     minionOut = []
     for m in board.minions['bottom']:
         if m is None:
-            minionOut.append("____")
+            minionOut.append("__")
         else:
-            minionOut.append(str(m))
+            minionOut.append(' ' + str(m) + ' ')
     minOut = ['# ',]
     minOut.extend(minionOut)
     minOut.extend([' #\n'])

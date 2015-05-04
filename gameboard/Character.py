@@ -21,10 +21,11 @@ class Character(object):
         self.board = None
 
     def __str__(self):
+        out = "%d  %s  %d" % (self.currentAttack, self.name, self.currentHealth)
         if 'taunt' in self.status:
-            out = "\%d  %s  %d/" % (self.currentAttack, self.name, self.currentHealth)
-        else: 
-            out = "(%d  %s  %d)" % (self.currentAttack, self.name, self.currentHealth)
+            out = "\\" + out + "/"
+        if 'divine' in self.status:
+            out = "(" + out + ")"
         if self.can_attack():
             out = "*" + out
         if 'windfury' in self.status:
@@ -88,6 +89,18 @@ class Character(object):
 
     def add_status(self, status):
         self.status.append(status)
+
+
+    def remove_status(self, status):
+        self.status.remove(status)
+
+
+    def take_damage(self, amount):
+        if 'divine' in self.status:
+            self.remove_status('divine')
+        else:
+            self.currentHealth -= amount
+
 
 
 class Minion(Character):

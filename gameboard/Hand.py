@@ -41,8 +41,10 @@ class Hand(object):
         self.size += 1
         card.hand = self
 
+
     def remove_card(self, card):
         self.cards.remove(card)
+        self.size -= 1
 
 
     def is_full(self):
