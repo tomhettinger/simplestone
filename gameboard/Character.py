@@ -21,9 +21,14 @@ class Character(object):
         self.board = None
 
     def __str__(self):
-        out = "(%d  %s  %d)" % (self.currentAttack, self.name, self.currentHealth)
+        if 'taunt' in self.status:
+            out = "\%d  %s  %d/" % (self.currentAttack, self.name, self.currentHealth)
+        else: 
+            out = "(%d  %s  %d)" % (self.currentAttack, self.name, self.currentHealth)
         if self.can_attack():
             out = "*" + out
+        if 'windfury' in self.status:
+            out = out + '@'
         return out
 
 
