@@ -58,16 +58,24 @@ class Board(object):
         return self.heroes[self.get_enemy_side()]
 
 
-    def get_minions(self, side=None):
-        """Return list of minions (default is the active one)."""
+    def get_minions(self, side=None, valid=False):
+        """Return list of minions (default is the active one). Includes None values."""
         if side is None:
             side = self.playerTurn
-        return self.minions[side]
+        minions = self.minions[side]
+        if valid:
+            return [minion for minion in minions if minion is not None]
+        else:
+            return minions
 
 
-    def get_enemy_minions(self):
-        """Return the minions from the opposite side."""
-        return self.minions[self.get_enemy_side()]
+    def get_enemy_minions(self, valid=False):
+        """Return the minions from the opposite side.  Includes None values."""
+        minions = self.minions[self.get_enemy_side()]
+        if valid:
+            return [minion for minion in minions if minion is not None]
+        else:
+            return minions
 
 
     def get_hand(self, side=None):
@@ -176,11 +184,15 @@ class Board(object):
 
 
     def get_targetable_characters(self, attacker):
-        """Return a list of characters that can be attacked by the attacker.  Check that
+        """Return a list of characters that can be ATTACKED by the attacker.  Check that
         the attacker can target opponent, and that the opponent can be targeted by attacker."""
+        enemy_taunts = [minion for minion in self.get_enemy_minions(valid=True) if 'taunt' in minion.status]
+
         targetableChars = []
         for potentialTarget in self.get_all_characters():
             if attacker.can_target(potentialTarget) and potentialTarget.targetable_by(attacker):
+                if len(enemy_taunts) and potentialTarget not in enemy_taunts:
+                    continue
                 targetableChars.append(potentialTarget)
         return targetableChars
 
