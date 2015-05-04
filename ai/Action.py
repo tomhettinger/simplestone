@@ -25,8 +25,28 @@ class AttackAction(Action):
 
 
 
-class PlayCardAction(Action):
-    """Play a card."""
+class PlayMinionAction(Action):
+    """Play a card to."""
+    def __init__(self, minionCard=None, side=None, targetPos=None):
+        self.minionCard = minionCard
+        self.side = side
+        self.targetPos = targetPos
+
+    def perform(self, board):
+        actions.play_minion_card(board, self.minionCard, self.targetPos)
+
+
+
+
+class PlaySpellAction(Action):
+    """Play a spell card."""
+    def __init__(self, spellCard=None, target=None):
+        self.spellCard = spellCard
+        self.target = target
+
+    def perform(self, board):
+        actions.play_spell_card(board, self.spellCard, self.target)        
+
 
 
 

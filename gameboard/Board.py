@@ -13,7 +13,7 @@ class Board(object):
         self.minions = {'top':[None, None, None, None, None, None, None], 'bottom':[None, None, None, None, None, None, None]}
         self.playerTurn = 'bottom'
         self.turnCount = 1
-        self.outputText = ""
+        self.log = ["",]
 
 
     def set_hand(self, hand, side):
@@ -36,32 +36,14 @@ class Board(object):
         character.board = self
 
 
-    def summon_minion(self, minion, side=None, pos=None):
-        """Place a minion on the board given the side and (optional) position. If position
-        is not specified, place the minion in lowest available spot (not implemented yet).
-        Positions range from 1-7.  Set attacksRemaining to 0, unless charge."""
-        if side is None:
-            side = self.get_side()
-        minion.side = side
-        minion.board = self
-        idx = pos - 1
-        if self.minions[side][idx] is not None:
-            raise Exception
-        self.minions[side][idx] = minion
-        if "charge" in minion.status:
-            minion.attacksRemaining = 1
-            if "windfury" in minion.status:
-                minion.attacksRemaining += 1
-
-
     def set_text(self, text):
         """Set the text to be displayed in the output field."""
-        self.outputText = text
+        self.log.append(text)
 
 
-    def get_text(self):
+    def get_log(self):
         """Return the current text to be displayed."""
-        return self.outputText
+        return self.log
 
 
     def get_hero(self, side=None):
@@ -272,6 +254,24 @@ class Board(object):
         hero.attacksRemaining = 1
         if 'windfury' in hero.status:
             hero.attacksRemaining += 1
+
+
+    def summon_minion(self, minion, side=None, pos=None):
+        """Place a minion on the board given the side and (optional) position. If position
+        is not specified, place the minion in lowest available spot (not implemented yet).
+        Positions range from 1-7.  Set attacksRemaining to 0, unless charge."""
+        if side is None:
+            side = self.get_side()
+        minion.side = side
+        minion.board = self
+        idx = pos - 1
+        if self.minions[side][idx] is not None:
+            raise Exception("Not a free spot.")
+        self.minions[side][idx] = minion
+        if "charge" in minion.status:
+            minion.attacksRemaining = 1
+            if "windfury" in minion.status:
+                minion.attacksRemaining += 1
 
 
     def destroy_minion(self, deadMinion):

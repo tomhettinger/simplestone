@@ -30,16 +30,26 @@ def draw_card(board, side):
         hand.add_card(cardDrawn)
 
 
-def play_minion(board, side, character, pos):
-    """Play a minion from your hand onto the field."""
-    minions = board.minions[side]
-    if character.manaCost > board.manaCurrent[side]:
-        raise Exception("Not enough mana. %d > %d" % (character.manaCost, board.manaCurrent[side]))
-    if minions[pos] is not None:
-        raise Exception("%s already on this spot." % minions[pos].name)
-    board.manaCurrent[side] -= character.manaCost
-    board.summon_minion(character, side, pos)
-    character.battlecry()
+def play_minion_card(board, card, pos):
+    """Play a minion from a hand onto the field."""
+    #minions = board.get_minions(side)
+    side = board.get_side()
+    minion = card.contents
+    if minion.manaCost > board.manaCurrent[side]:
+        raise Exception("Not enough mana. %d > %d" % (minion.manaCost, board.manaCurrent[side]))
+    minion.board = board
+    minion.battlecry()
+    board.subtract_mana(minion.manaCost)
+    board.get_hand().remove_card(card)
+    board.summon_minion(minion, side, pos)
+
+
+def play_spell_card(board, card, target=None):
+    """Play a spell card.  Cast the spell, subtract mana, and throw away card."""
+    spell = card.contents
+    board.subtract_mana(spell.manaCost)
+    board.get_hand().remove_card(card)
+    spell.cast(board, target)
 
 
 def deal_fatigue(hero):

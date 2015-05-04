@@ -100,8 +100,10 @@ def refresh(board):
 
     # Border
     out += BORDER_LINE
-    out += "{:<140}".format(board.get_text())
-    out += "\n"
+    log = board.get_log()
+    for line in log[-5:]:
+        out += "{:<140}".format(line.strip())
+        out += "\n"
 
     print out
 
@@ -132,7 +134,7 @@ def play_loop(board, ai=None):
         command = None
         while command not in ['p', 'a', 'h', 'e', 'q']:
             refresh(board)  
-            command = raw_input("{:^100}".format("[p] Play Card   [a] Attack w/ Char   [h] Hero Power   [e] End Turn   [q] Quit\n"))
+            command = raw_input("{:<140}".format("<p> Play Card   <a> Attack w/ Char   <h> Hero Power   <e> End Turn   <q> Quit\n"))
 
         # Execute insructions
         if command == 'q':
@@ -166,13 +168,12 @@ def play_card(board):
         play_choices.extend([str(x) for x in playableCardPos])
         command = None
         while command not in play_choices:
-            board.set_text("Select a card:")
             refresh(board)
-            outLine = ""
+            outLine = "Select a card:  "
             for i in playableCardPos:
-                outLine += "<%d> %s   " % (i, hand.cards[i-1].name)
-            outLine += "<b> Back   <q> Quit\n"
-            command = raw_input("{:^100}".format(outLine))
+                outLine += "<%d> %s  " % (i, hand.cards[i-1].name)
+            outLine += "                    <b> Back  <q> Quit\n"
+            command = raw_input("{:<140}".format(outLine))
 
         # Execute instruction
         if command == 'q':
@@ -186,7 +187,7 @@ def play_card(board):
             if isinstance(cardToPlay.contents, Character):
                 play_character_from_hand(board, cardToPlay)
             elif isinstance(cardToPlay.contents, Spell):
-                play_spell_from_hand(board, cardToPlay)
+                actions.play_spell_card(board, cardToPlay) 
             elif isinstance(cardToPlay.contents, Weapon):
                 play_weapon_from_hand(board, cardToPlay)
             else:
@@ -208,13 +209,12 @@ def play_character_from_hand(board, cardToPlay):
         play_choices.extend([str(x) for x in emptyMinionPos])
         command = None
         while command not in play_choices:
-            board.set_text("Select a position to place minion:")
             refresh(board)
-            outLine = ""
+            outLine = "Choose spot to play minion:  "
             for i in emptyMinionPos:
                 outLine += "<%d>   " % i
-            outLine += "<b> Back   <q> Quit\n"
-            command = raw_input("{:^100}".format(outLine))
+            outLine += "                    <b> Back   <q> Quit\n"
+            command = raw_input("{:<140}".format(outLine))
 
         # Execute instructions
         if command == 'q':
@@ -222,14 +222,9 @@ def play_character_from_hand(board, cardToPlay):
         elif command == 'b':
             break
         else:
+            # Play the minion
             pos = int(command)
-            minion = cardToPlay.contents
-            # Place minion, excecute the battlecry, remove attack, remove from hand, reduce player mana.
-            minion.board = board
-            minion.battlecry()
-            board.subtract_mana(minion.manaCost)
-            board.get_hand().remove_card(cardToPlay)
-            board.summon_minion(minion, board.get_side(), pos)
+            actions.play_minion_card(board, cardToPlay, pos)
             break
 
 
@@ -243,18 +238,6 @@ def play_weapon_from_hand(board, cardToPlay):
     board.hands[side].remove_card(cardToPlay)
     board.manaCurrent[side] -= weapon.manaCost
 
-
-def play_spell_from_hand(board, cardToPlay):
-    """Cast a spell."""
-    spell = cardToPlay.contents
-    # Cast spell
-    board.set_text("Casting %s. (Not implemented yet, except The Coin)." % spell.name)
-    if spell.name == 'The Coin':
-        board.add_mana(1)
-    # Remove from hand and reduce players mana.
-    board.subtract_mana(spell.manaCost)
-    board.get_hand().remove_card(cardToPlay)
-    
 
 def select_attacker(board):
     """Select a minion to use to do some attacking.  If valid attacker and defender are choosen,
@@ -271,13 +254,12 @@ def select_attacker(board):
         play_choices.extend([str(x) for x in canAttackPos])
         command = None
         while command not in play_choices:
-            board.set_text("Select a character to attack with:")
             refresh(board)
-            outLine = ""
+            outLine = "Select char to attack with:  "
             for i in canAttackPos:
                 outLine += "<%d> %s   " % (i, board.get_character(i).name)
-            outLine += "<b> Back   [q] Quit\n"
-            command = raw_input("{:^100}".format(outLine))
+            outLine += "                    <b> Back   [q] Quit\n"
+            command = raw_input("{:<140}".format(outLine))
 
         # Execute instructions
         if command == 'q':
@@ -313,14 +295,13 @@ def select_target(board, attacker):
             play_choices.append(str(board.get_target_pos(char)))
         command = None
         while command not in play_choices:
-            board.set_text("Select an enemy to attack:")
             refresh(board)
-            outLine = ""
+            outLine = "Choose enemy to attack:  "
             for char in attackableCharacters:
                 pos = board.get_target_pos(char)
                 outLine += "<%d> %s   " % (pos, char.name)
-            outLine += "<b> Back   <q> Quit\n"
-            command = raw_input("{:^100}".format(outLine))
+            outLine += "                    <b> Back   <q> Quit\n"
+            command = raw_input("{:<140}".format(outLine))
 
         # Execute instructions.
         if command == 'q':
@@ -344,7 +325,8 @@ def end_turn(board):
 def begin_turn(board):
     """Begin the turn and take necessary actions."""
     # Increase counter and switch sides.
-    board.set_text("")
+    if board.get_side() == 'bottom':
+        board.set_text("Player Turn.")
     board.increment_turn()
     board.change_side()
 

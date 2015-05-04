@@ -15,8 +15,17 @@ class Hand(object):
         return self.cards[pos-1]
 
 
+    def get_playable_cards(self):
+        """Return a list of the cards that can be played."""
+        playableCards = []
+        for card in self.cards:
+            if card.can_play():
+                 playableCards.append(card)
+        return playableCards
+
+
     def get_playable_card_positions(self):
-        """Reutn the position (idx+1) of the cards that can be played."""
+        """Return the position (idx+1) of the cards that can be played."""
         playableCardPos = []
         for i, card in enumerate(self.cards):
             if card.can_play():

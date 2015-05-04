@@ -28,11 +28,11 @@ class Character(object):
 
 
     def deathrattle(self):
-        self.board.outputText = "%s destroyed. DEATHRATTLE." % self.name
+        self.board.set_text("%s destroyed. DEATHRATTLE." % self.name)
         # Execute deathrattle here.
 
     def battlecry(self):
-        self.board.outputText = "%s is played from the hand. BATTLECRY." % self.name
+        self.board.set_text("%s is played from the hand. BATTLECRY." % self.name)
         # Execute battlecry here.
 
     def can_attack(self):
