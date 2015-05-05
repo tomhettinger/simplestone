@@ -67,7 +67,7 @@ class DoNothingAction(Action):
     """Don't do anything this action."""
     def perform(self, board):
         board.set_text("AI does nothing.")
-        pass
+        
 
     def __str__(self):
         return "Do nothing."

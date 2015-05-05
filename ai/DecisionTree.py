@@ -1,5 +1,6 @@
 from copy import deepcopy
 from random import random
+import Action
 
 class DecisionTree(object):
     """A tree for deciding the best path of actions to take."""
@@ -13,6 +14,7 @@ class DecisionTree(object):
         self.children = []
         self.winStrength = None
         self.maxWinStrength = None   # best winStrength if you choose this path.
+        self.bestAction = None
 
         # Perform initial action.        
         if self.action is not None:
@@ -23,6 +25,8 @@ class DecisionTree(object):
         self.availableActions = self.currentBoardState.get_available_actions()
         # Create children
         self.create_children()
+        # Set the best action
+        self.calculate_best_action()
 
 
     def get_winStrength(self):
@@ -34,7 +38,11 @@ class DecisionTree(object):
 
     def create_children(self):
         """For each Action in the availableActions, create a decision tree with a hardcopy
-        of the board state."""
+        of the board state. If we just 'did nothing', don't make children."""
+        if isinstance(self.action, Action.DoNothingAction):
+            return
+        #if len(self.availableActions) == 1 and isinstance(self.availableActions[0], Action.DoNothingAction):
+        #    return
         for a in range(len(self.availableActions)):
             boardCopy = deepcopy(self.currentBoardState)
             action = boardCopy.get_available_actions()[a]
@@ -52,7 +60,7 @@ class DecisionTree(object):
         if not len(self.children):
             self.maxWinStrength = self.get_winStrength()
         else:
-            maxStrength = max([child.get_max_win_strength() for child in children])
+            maxStrength = max([child.get_max_win_strength() for child in self.children])
             self.maxWinStrength = maxStrength
 
 
@@ -75,12 +83,14 @@ class DecisionTree(object):
         return bestChild
 
 
-    #def calculate_best_action_list(self):
-    #    """Return a list of actions that represent the best course of action."""
-    #    actionList = []
-    #    if not len(self.children):
-    #        return actionList
-    #    actionList.append()
+    def calculate_best_action(self):
+        """Set the bestAction attribute to an Action that represent the best thing to do."""
+        if isinstance(self.action, Action.DoNothingAction):
+            return
+        if len(self.availableActions):
+            bestChild = self.get_best_child()
+            idx = self.children.index(bestChild)
+            self.bestAction = self.availableActions[idx]
 
 
     def print_tree(self):

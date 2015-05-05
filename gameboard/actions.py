@@ -4,9 +4,7 @@
 def minion_attack(board, attacker, defender):
     """Attack the defender with attacker."""
     board.set_text("%s attacks %s." % (attacker.name, defender.name))
-    #defender.currentHealth -= attacker.currentAttack
     defender.take_damage(attacker.currentAttack)
-    #attacker.currentHealth -= defender.currentAttack
     attacker.take_damage(defender.currentAttack)
     attacker.attacksRemaining -= 1
     if defender.currentHealth <= 0:

@@ -216,14 +216,15 @@ class Board(object):
             return pos
         return None
 
-    ######################WIP WIP WIP
+
     def get_available_actions(self):
         """Find out every possible action for this instant."""
         availableActions = []
-        #availableActions.append(Action.DoNothingAction())  # Do nothing.
         availableActions.extend(self.get_card_play_actions())
         availableActions.extend(self.get_attack_actions())
         #availableActions.extend(heroAbilityActions)
+        if len(availableActions):
+            availableActions.append(Action.DoNothingAction())
         return availableActions
 
 
@@ -237,8 +238,9 @@ class Board(object):
         for card in playableCards:
             # Create actions for dropping a minion.
             if isinstance(card.contents, Character) and len(emptyPositions):
-                for pos in emptyPositions:
-                    actionList.append(Action.PlayMinionAction(card, self.get_side(), pos))
+                #for pos in emptyPositions:
+                #    actionList.append(Action.PlayMinionAction(card, self.get_side(), pos))
+                actionList.append(Action.PlayMinionAction(card, self.get_side(), emptyPositions[0])) # Always play in the first empty spot.
 
             # Create actions for using a spell
             elif isinstance(card.contents, Spell):
@@ -262,8 +264,6 @@ class Board(object):
             for target in potentialTargets:
                 actionList.append(Action.AttackAction(character, target))
         return actionList
-    ######################WIP WIP WIP
-
 
 
     def update_mana(self):
