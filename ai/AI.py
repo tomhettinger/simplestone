@@ -26,7 +26,7 @@ class AI(object):
         loop.end_turn(board)
 
 
-    def get_available_actions(self, board):
+    def get_available_actions(self, board):                                  ### This has been replaced by same method in Board.py
         """Find out every possible action for this instant."""
         availableActions = []
         #availableActions.append(Action.DoNothingAction())  # Do nothing.
@@ -36,7 +36,7 @@ class AI(object):
         return availableActions
 
 
-    def get_attack_actions(self, board):
+    def get_attack_actions(self, board):                                     ### This has been replaced by same method in Board.py
         """Find all possible attack combinations and return a list of them."""
         actionList = []
         potentialAttackers = board.get_canAttack_characters()
@@ -51,7 +51,7 @@ class AI(object):
         return actionList
 
 
-    def get_card_play_actions(self, board):
+    def get_card_play_actions(self, board):                                 ### This has been replaced by same method in Board.py
         actionList = []
         playableCards = board.get_hand().get_playable_cards()
         if not len(playableCards):

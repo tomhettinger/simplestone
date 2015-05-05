@@ -87,11 +87,12 @@ class DecisionTree(object):
         """Print this tree and all of the children."""
         out = ""
         for i in range(self.level):
-            out += '--'
+            out += '   |'
+        out += '___'
+        out += str(self.action)
         if self.action is None:
-            out += "None"
+            print "None"
         else:
-            out += str(self.action)
-        print out
+            print out
         for child in self.children:
             child.print_tree()
