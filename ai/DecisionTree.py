@@ -1,17 +1,29 @@
 from copy import deepcopy
 from random import random
+import threading
+
 import Action
+
+MAX_ACTION_LOOKAHEAD = 4
+
+def create_child(parent, idx):
+    """Create a DecisionTree.  This can be run as a thread."""
+    boardCopy = deepcopy(parent.currentBoardState)
+    action = boardCopy.get_available_actions()[idx]
+    parent.children[idx] = DecisionTree(boardCopy, action, parent.level+1, parent)
+
+
 
 class DecisionTree(object):
     """A tree for deciding the best path of actions to take."""
     def __init__(self, boardState, action=None, level=0, parent=None):
         self.currentBoardState = boardState
         self.action = action
-        if level >= 100:
-            raise Exception("100 consecutive actions is too many for one turn.")
+        if level >= 20:
+            raise Exception("20 consecutive actions is too many for one turn.")
         self.level = level
         self.parent = parent
-        self.children = []
+        #self.children = []
         self.winStrength = None
         self.maxWinStrength = None   # best winStrength if you choose this path.
         self.bestChild = None
@@ -66,13 +78,28 @@ class DecisionTree(object):
     def create_children(self):
         """For each Action in the availableActions, create a decision tree with a hardcopy
         of the board state. If we just 'did nothing', don't make children."""
+        # If action is to stop early, don't create children.
         if isinstance(self.action, Action.DoNothingAction):
+            self.children = []
             return
-        for a in range(len(self.availableActions)):
-            boardCopy = deepcopy(self.currentBoardState)
-            action = boardCopy.get_available_actions()[a]
-            child = DecisionTree(boardCopy, action, self.level+1, self)
-            self.children.append(child)
+        # If this is the (e.g. 4th) action, stop looking ahead.  CPU can't handle it.
+        if self.level >= MAX_ACTION_LOOKAHEAD:
+            self.children = []
+            return
+        actionCount = len(self.availableActions)
+        self.children = [None] * actionCount
+
+        # Split creation into multiple threads if this is the master node.
+        if self.level == 0:
+            threads = [None] * actionCount
+            for idx in range(actionCount):
+                threads[idx] = threading.Thread(target=create_child, args=(self, idx))
+                threads[idx].start()
+            for t in threads:
+                t.join()
+        else:
+            for idx in range(actionCount):
+                create_child(self, idx)
 
 
     def calculate_my_win_strength(self):
@@ -104,7 +131,7 @@ class DecisionTree(object):
         """Set the bestAction attribute to an Action that represent the best thing to do."""
         if isinstance(self.action, Action.DoNothingAction):
             return
-        if len(self.availableActions):
+        if len(self.children):
             bestChild = self.get_best_child()
             idx = self.children.index(bestChild)
             self.bestAction = self.availableActions[idx]
