@@ -14,54 +14,31 @@ class DecisionTree(object):
         self.children = []
         self.winStrength = None
         self.maxWinStrength = None   # best winStrength if you choose this path.
+        self.bestChild = None
         self.bestAction = None
 
         # Perform initial action.        
         if self.action is not None:
             self.action.perform(self.currentBoardState)  # This will crash if a hero dies.
         # Calculate current win strength
-        self.calculate_win_strength()
+        self.calculate_my_win_strength()
         # Find all possible moves.
         self.availableActions = self.currentBoardState.get_available_actions()
         # Create children
         self.create_children()
-        # Set the best action
+        # Calculate max win strength
+        self.calculate_max_win_strength()
+        # Calculate the best action from here.
         self.calculate_best_action()
+        # Delete children to save RAM
+        del self.children
 
 
     def get_winStrength(self):
         """Return the win strength value (calculate it if needed)."""
         if self.winStrength is None:
-            self.calculate_win_strength()
+            self.calculate_my_win_strength()
         return self.winStrength
-
-
-    def create_children(self):
-        """For each Action in the availableActions, create a decision tree with a hardcopy
-        of the board state. If we just 'did nothing', don't make children."""
-        if isinstance(self.action, Action.DoNothingAction):
-            return
-        #if len(self.availableActions) == 1 and isinstance(self.availableActions[0], Action.DoNothingAction):
-        #    return
-        for a in range(len(self.availableActions)):
-            boardCopy = deepcopy(self.currentBoardState)
-            action = boardCopy.get_available_actions()[a]
-            child = DecisionTree(boardCopy, action, self.level+1, self)
-            self.children.append(child)
-
-
-    def calculate_win_strength(self):
-        """Calculate the strength of this boardState and return a value."""
-        self.winStrength = random()   # Temporary place holder.
-
-
-    def calculate_max_win_strength(self):
-        """Calculate the maximum win strength of all leafs in this tree."""
-        if not len(self.children):
-            self.maxWinStrength = self.get_winStrength()
-        else:
-            maxStrength = max([child.get_max_win_strength() for child in self.children])
-            self.maxWinStrength = maxStrength
 
 
     def get_max_win_strength(self):
@@ -73,6 +50,46 @@ class DecisionTree(object):
 
 
     def get_best_child(self):
+        """Return bestChild.  Calculate it if necessary."""
+        if self.bestChild is None:
+            self.calculate_best_child()
+        return self.bestChild
+
+
+    def get_best_action(self):
+        """Return bestAction.  Calculate it if necessary."""
+        if self.bestAction is None:
+            self.calculate_best_action()
+        return self.bestAction
+
+
+    def create_children(self):
+        """For each Action in the availableActions, create a decision tree with a hardcopy
+        of the board state. If we just 'did nothing', don't make children."""
+        if isinstance(self.action, Action.DoNothingAction):
+            return
+        for a in range(len(self.availableActions)):
+            boardCopy = deepcopy(self.currentBoardState)
+            action = boardCopy.get_available_actions()[a]
+            child = DecisionTree(boardCopy, action, self.level+1, self)
+            self.children.append(child)
+
+
+    def calculate_my_win_strength(self):
+        """Calculate the strength of this boardState and return a value."""
+        self.winStrength = random()   # Temporary place holder.
+
+
+    def calculate_max_win_strength(self):
+        """Calculate the maximum win strength of all paths from here down to the roots."""
+        if not len(self.children):
+            self.maxWinStrength = self.get_winStrength()
+        else:
+            maxStrength = max([child.get_max_win_strength() for child in self.children])
+            self.maxWinStrength = maxStrength
+
+
+    def calculate_best_child(self):
         """Return the child that maximizes the chance of winning (it has the greatest maxWinStrength value)."""
         if not len(self.children):
             raise Exception("No actions can be done.")
@@ -80,7 +97,7 @@ class DecisionTree(object):
         childValueTupleList = [(child, child.get_max_win_strength()) for child in self.children]
         childValueTupleList.sort(reverse=True, key=lambda tup: tup[1])
         bestChild = childValueTupleList[0][0]
-        return bestChild
+        self.bestChild = bestChild
 
 
     def calculate_best_action(self):
@@ -94,7 +111,8 @@ class DecisionTree(object):
 
 
     def print_tree(self):
-        """Print this tree and all of the children."""
+        """Print this tree and all of the children.
+        Can not be used if the children have been deleted to save RAM."""
         out = ""
         for i in range(self.level):
             out += '   |'
