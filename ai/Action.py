@@ -12,6 +12,10 @@ class Action(object):
         pass
 
 
+    def __str__(self):
+        return str(type(self))
+
+
 
 class AttackAction(Action):
     """Attack with a character."""
@@ -22,6 +26,9 @@ class AttackAction(Action):
     def perform(self, board):
         actions.minion_attack(board, self.attacker, self.target)
 
+
+    def __str__(self):
+        return "Use %s to attack %s" % (self.attacker.name, self.target.name)
 
 
 
@@ -36,6 +43,9 @@ class PlayMinionAction(Action):
         actions.play_minion_card(board, self.minionCard, self.targetPos)
 
 
+    def __str__(self):
+        return "Play minion %s on position %d" % (self.minionCard.name, self.targetPos)
+
 
 
 class PlaySpellAction(Action):
@@ -48,6 +58,9 @@ class PlaySpellAction(Action):
         actions.play_spell_card(board, self.spellCard, self.target)        
 
 
+    def __str__(self):
+        return "Play spell %s." % (self.spellCard.name)
+
 
 
 class DoNothingAction(Action):
@@ -55,3 +68,6 @@ class DoNothingAction(Action):
     def perform(self, board):
         board.set_text("AI does nothing.")
         pass
+
+    def __str__(self):
+        return "Do nothing."

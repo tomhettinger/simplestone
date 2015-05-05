@@ -43,6 +43,8 @@ class Hand(object):
 
 
     def remove_card(self, card):
+        if card not in self.cards:
+            raise Exception("%s not in this hand. %s" % (card.name, str(self)))
         self.cards.remove(card)
         self.size -= 1
 

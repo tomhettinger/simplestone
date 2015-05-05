@@ -57,7 +57,6 @@ def main(*args):
     else:
         debug = False
     
-
     board = create_game(debug=debug)    
     if 'vs' in args[0]:
         loop.play_loop(board)

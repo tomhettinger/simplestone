@@ -1,5 +1,7 @@
 MAX_MINIONS = 7
-
+import ai.Action as Action
+from Character import Character
+from Spell import Spell
 
 class Board(object):
     """Board class which holds minions on it (4 per side) and Heros."""
@@ -213,6 +215,55 @@ class Board(object):
             pos = self.get_enemy_minions().index(targetChar) + 1
             return pos
         return None
+
+    ######################WIP WIP WIP
+    def get_available_actions(self):
+        """Find out every possible action for this instant."""
+        availableActions = []
+        #availableActions.append(Action.DoNothingAction())  # Do nothing.
+        availableActions.extend(self.get_card_play_actions())
+        availableActions.extend(self.get_attack_actions())
+        #availableActions.extend(heroAbilityActions)
+        return availableActions
+
+
+    def get_card_play_actions(self):
+        actionList = []
+        playableCards = self.get_hand().get_playable_cards()
+        if not len(playableCards):
+            return []
+        emptyPositions = self.get_empty_minion_positions()
+
+        for card in playableCards:
+            # Create actions for dropping a minion.
+            if isinstance(card.contents, Character) and len(emptyPositions):
+                for pos in emptyPositions:
+                    actionList.append(Action.PlayMinionAction(card, self.get_side(), pos))
+
+            # Create actions for using a spell
+            elif isinstance(card.contents, Spell):
+                actionList.append(Action.PlaySpellAction(card))
+
+            # Create actions for equipping a weapon.
+
+        return actionList
+
+
+    def get_attack_actions(self):
+        """Find all possible attack combinations and return a list of them."""
+        actionList = []
+        potentialAttackers = self.get_canAttack_characters()
+        if not len(potentialAttackers):
+            return []
+        for character in potentialAttackers:
+            potentialTargets = self.get_targetable_characters(character)
+            if not len(potentialTargets):
+                continue
+            for target in potentialTargets:
+                actionList.append(Action.AttackAction(character, target))
+        return actionList
+    ######################WIP WIP WIP
+
 
 
     def update_mana(self):

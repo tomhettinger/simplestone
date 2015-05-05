@@ -20,7 +20,7 @@ class DecisionTree(object):
         # Calculate current win strength
         self.calculate_win_strength()
         # Find all possible moves.
-        self.availableActions = self.currentBoardState.get_available_actions()  # This should be copied over from the AI class method.
+        self.availableActions = self.currentBoardState.get_available_actions()
         # Create children
         self.create_children()
 
@@ -35,8 +35,10 @@ class DecisionTree(object):
     def create_children(self):
         """For each Action in the availableActions, create a decision tree with a hardcopy
         of the board state."""
-        for action in self.availableActions:
-            child = DecisionTree(deepcopy(self.currentBoardState), action, self.level+1, self)
+        for a in range(len(self.availableActions)):
+            boardCopy = deepcopy(self.currentBoardState)
+            action = boardCopy.get_available_actions()[a]
+            child = DecisionTree(boardCopy, action, self.level+1, self)
             self.children.append(child)
 
 
@@ -57,7 +59,7 @@ class DecisionTree(object):
     def get_max_win_strength(self):
         """Return the maximum win strength of all leafs in this tree.
         Calculate it if necessary."""
-        if self.maxWinStrength is not None:
+        if self.maxWinStrength is None:
             self.calculate_max_win_strength()
         return self.maxWinStrength
 
@@ -79,3 +81,17 @@ class DecisionTree(object):
     #    if not len(self.children):
     #        return actionList
     #    actionList.append()
+
+
+    def print_tree(self):
+        """Print this tree and all of the children."""
+        out = ""
+        for i in range(self.level):
+            out += '--'
+        if self.action is None:
+            out += "None"
+        else:
+            out += str(self.action)
+        print out
+        for child in self.children:
+            child.print_tree()

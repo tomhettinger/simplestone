@@ -58,7 +58,6 @@ class AI(object):
             return []
         emptyPositions = board.get_empty_minion_positions()
 
-        
         for card in playableCards:
             # Create actions for dropping a minion.
             if isinstance(card.contents, Character) and len(emptyPositions):
