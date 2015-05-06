@@ -24,7 +24,7 @@ minions['wisp'] = Minion("Wisp", 1, 1, 0)
 minions['boar'] = Minion("Boar", 1, 1, 1, 'charge')
 minions['gsFootman'] = Minion("Footman", 1, 2, 1, 'taunt')
 minions['shieldbearer'] = Minion("Shldbearer", 0, 4, 1, 'taunt')
-minions['yDragonhawk'] = Minion("Y.Drgnhawk", 1, 1, 1, 'windfury')
+minions['yDragonhawk'] = Minion("Y.Drgnhwk", 1, 1, 1, 'windfury')
 minions['Argent Squire'] = Minion("ArgentSqre", 1, 1, 1, 'divine')
 
 minions['raptor'] = Minion("Raptor", 3, 2, 2)

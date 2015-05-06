@@ -1,3 +1,6 @@
+import random
+
+
 class Character(object):
     """Base character class.
     """
@@ -20,6 +23,7 @@ class Character(object):
         self.side = None
         self.board = None
 
+
     def __str__(self):
         out = "%d  %s  %d" % (self.currentAttack, self.name, self.currentHealth)
         if 'taunt' in self.status:
@@ -37,9 +41,11 @@ class Character(object):
         self.board.set_text("%s destroyed. DEATHRATTLE." % self.name)
         # Execute deathrattle here.
 
+
     def battlecry(self):
         self.board.set_text("%s is played from the hand. BATTLECRY." % self.name)
         # Execute battlecry here.
+
 
     def can_attack(self):
         return (self.attacksRemaining > 0) and ('frozen' not in self.status) and (self.currentAttack > 0) and (self.side == self.board.playerTurn)
@@ -114,8 +120,12 @@ class Hero(Character):
         super(Hero, self).__init__(name, baseAttack, baseHealth, manaCost)
         self.fatigueDMG = 1
 
+
     def __str__(self):
         out = "[%d  %s  %d]" % (self.currentAttack, self.name, self.currentHealth)
-        if self.can_attack():
+        if self.currentHealth <= 0:
+            out += "                    "
+            out = ''.join(random.sample(out, len(out)))
+        elif self.can_attack():
             out = "*" + out
         return out
