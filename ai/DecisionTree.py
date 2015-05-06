@@ -1,5 +1,5 @@
 from copy import deepcopy
-from random import random
+from random import random, shuffle
 import threading
 
 import Action
@@ -10,24 +10,27 @@ def create_child(parent, idx):
     """Create a DecisionTree.  This can be run as a thread."""
     boardCopy = deepcopy(parent.currentBoardState)
     action = boardCopy.get_available_actions()[idx]
-    parent.children[idx] = DecisionTree(boardCopy, action, parent.level+1, parent)
+    parent.children[idx] = DecisionTree(boardCopy, action, parent.level+1, parent, strategy=parent.strategy)
 
 
 
 class DecisionTree(object):
-    """A tree for deciding the best path of actions to take."""
-    def __init__(self, boardState, action=None, level=0, parent=None):
+    """A tree for deciding the best path of actions to take.  Strategy is a function that accepts
+    a copy of the boardState and expects either a numeric value for winStrength (greater is better) or
+    "force" or "avoid"."""
+    def __init__(self, boardState, action=None, level=0, parent=None, strategy=None):
         self.currentBoardState = boardState
         self.action = action
         if level >= 20:
             raise Exception("20 consecutive actions is too many for one turn.")
         self.level = level
         self.parent = parent
-        #self.children = []
+        self.children = None
         self.winStrength = None
         self.maxWinStrength = None   # best winStrength if you choose this path.
         self.bestChild = None
         self.bestAction = None
+        self.strategy = strategy
 
         # Perform initial action.        
         if self.action is not None:
@@ -104,7 +107,7 @@ class DecisionTree(object):
 
     def calculate_my_win_strength(self):
         """Calculate the strength of this boardState and return a value."""
-        self.winStrength = random()   # Temporary place holder.
+        self.winStrength = self.strategy(deepcopy(self.currentBoardState))
 
 
     def calculate_max_win_strength(self):
@@ -123,7 +126,10 @@ class DecisionTree(object):
         # Get a list of (child, maxWinStrength) tuples.  Then sort it.
         childValueTupleList = [(child, child.get_max_win_strength()) for child in self.children]
         childValueTupleList.sort(reverse=True, key=lambda tup: tup[1])
-        bestChild = childValueTupleList[0][0]
+        # Find all children with wStrength equal to the best, then shuffle them to choose a random choice.
+        equalButBestTup = [tup for tup in childValueTupleList if tup[1] == childValueTupleList[0][1]]
+        shuffle(equalButBestTup)
+        bestChild = equalButBestTup[0][0]
         self.bestChild = bestChild
 
 

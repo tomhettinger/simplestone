@@ -13,7 +13,7 @@ import data.decks as decks
 import data.library as library
 
 from ai.AI import AI
-
+from ai import strategy
 
 def create_game(debug=False):
     # Create the board
@@ -61,11 +61,11 @@ def main(*args):
     if 'vs' in args[0]:
         loop.play_loop(board)
     elif 'cpu' in args[0]:
-        ai = AI()
-        ai2 = AI()
+        ai = AI(strategy=strategy.attack_face)
+        ai2 = AI(strategy=strategy.minion_control)
         loop.play_loop(board, ai, ai2)
     else:
-        ai = AI()
+        ai = AI(strategy=strategy.minion_control)
         loop.play_loop(board, ai)
 
 

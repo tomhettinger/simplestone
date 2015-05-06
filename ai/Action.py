@@ -66,7 +66,7 @@ class PlaySpellAction(Action):
 class DoNothingAction(Action):
     """Don't do anything this action."""
     def perform(self, board):
-        board.set_text("AI does nothing.")
+        board.set_text("AI chooses not to act.")
         
 
     def __str__(self):

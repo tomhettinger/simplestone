@@ -35,21 +35,21 @@ minions['annoyotron'] = Minion("Annoy-o-Tron", 1, 2, 2, ['taunt', 'divine'])
 minions['rager'] = Minion("Rager", 5, 1, 3)
 minions['wolfrider'] = Minion("Wolfrider", 3, 1, 3, 'charge')
 minions['ironfur'] = Minion("Ironfur", 3, 3, 3, 'taunt')
-minions['silverback'] = Minion("Silverback", 1, 4, 3, 'taunt')
+minions['silverback'] = Minion("Slvrback", 1, 4, 3, 'taunt')
 minions['thrallmar'] = Minion("Thrallmar", 2, 3, 3, 'windfury')
-minions['flyingMachine'] = Minion("FlyMachine", 1, 4, 3, 'windfury')
-minions['scarletCrusader'] = Minion("ScarletCrus", 3, 1, 3, 'divine')
-minions['gnomeregan'] = Minion("Gnomeregan", 1, 4, 3, ['charge', 'taunt'])
+minions['flyingMachine'] = Minion("FlyMachin", 1, 4, 3, 'windfury')
+minions['scarletCrusader'] = Minion("ScrltCrus", 3, 1, 3, 'divine')
+minions['gnomeregan'] = Minion("Gnomergan", 1, 4, 3, ['charge', 'taunt'])
 
 minions['yeti'] = Minion("Yeti", 4, 5, 4)
-minions['tallstrider'] = Minion("Tallstrider", 5, 4, 4)
+minions['tallstrider'] = Minion("Tallstridr", 5, 4, 4)
 minions['stormwindKnight'] = Minion("Knight", 2, 5, 4, 'charge')
 minions['mogushan'] = Minion("Mogu'shan", 1, 7, 4, 'taunt')
 minions['senjin'] = Minion("Sen'jin", 3, 5, 4, 'taunt')
-minions['silvermoonGuardian'] = Minion("SilverMoon", 3, 3, 4, 'divine')
+minions['silvermoonGuardian'] = Minion("SlvrMoon", 3, 3, 4, 'divine')
 
 minions['bootyBay'] = Minion("BootyBay", 5, 4, 5, 'taunt')
-minions['fenCreeper'] = Minion("FenCreeper", 3, 6, 5, 'taunt')
+minions['fenCreeper'] = Minion("FenCreep", 3, 6, 5, 'taunt')
 
 minions['ogre'] = Minion("Ogre", 6, 7, 6)
 minions['rocketeer'] = Minion("Rocketeer", 5, 2, 6, 'charge')
@@ -60,7 +60,7 @@ minions['sunwalker'] = Minion("Sunwalker", 4, 5, 6, ['taunt', 'divine'])
 
 minions['coreHound'] = Minion("CoreHound", 9, 5, 7)
 
-minions['forceTank'] = Minion("Force-Tank", 7, 7, 8, 'divine')
+minions['forceTank'] = Minion("FrceTank", 7, 7, 8, 'divine')
 
 # Weapons
 weapons['axe'] = Weapon("Axe", 4, 1, 3)

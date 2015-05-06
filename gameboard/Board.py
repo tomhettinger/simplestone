@@ -52,6 +52,8 @@ class Board(object):
         """Return one of the heroes (default is the active one)."""
         if side is None:
             side = self.playerTurn
+        elif side == 'enemy':
+            side = self.get_enemy_side()
         return self.heroes[side]
 
 
