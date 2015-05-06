@@ -1,17 +1,20 @@
 from copy import deepcopy
 from random import random, shuffle
 import threading
+import multiprocessing
 
 import Action
 
-MAX_ACTION_LOOKAHEAD = 4
+MAX_ACTION_DEPTH = 3
+MAX_LEVEL_1_CHILDREN = 16
+WIN_VALUE = 1e6
+USE_THREADS = True
 
 def create_child(parent, idx):
     """Create a DecisionTree.  This can be run as a thread."""
     boardCopy = deepcopy(parent.currentBoardState)
     action = boardCopy.get_available_actions()[idx]
     parent.children[idx] = DecisionTree(boardCopy, action, parent.level+1, parent, strategy=parent.strategy)
-
 
 
 class DecisionTree(object):
@@ -35,16 +38,43 @@ class DecisionTree(object):
         # Perform initial action.        
         if self.action is not None:
             self.action.perform(self.currentBoardState)  # This will crash if a hero dies.
+        
         # Calculate current win strength
         self.calculate_my_win_strength()
+        
         # Find all possible moves.
         self.availableActions = self.currentBoardState.get_available_actions()
-        # Create children
-        self.create_children()
+
+        # Set the maximum depth level (default if master node, use parent's otherwise).
+        if self.level > 0:
+            self.maxDepth = parent.maxDepth
+        else:
+            # If there are many moves, we can't go exploring too deep.
+            if len(self.availableActions) > MAX_LEVEL_1_CHILDREN:
+                print "AI is thinking..."
+                self.maxDepth = 2
+            else:
+                self.maxDepth = MAX_ACTION_DEPTH
+
+        # Create children:
+        # If action is to stop early, don't create children.
+        if isinstance(self.action, Action.DoNothingAction):
+            self.children = []
+        # If this is the (e.g. 3rd or 4th) action, stop looking ahead.  CPU can't handle it.
+        elif self.level >= self.maxDepth:
+            self.children = []
+        # If you've already defeated the opponent, stop looking ahead.
+        elif (self.currentBoardState.get_hero('top').currentHealth <= 0) or (self.currentBoardState.get_hero('bottom').currentHealth <=0):
+            self.children = []
+        else:
+            self.create_children()
+        
         # Calculate max win strength
         self.calculate_max_win_strength()
+        
         # Calculate the best action from here.
         self.calculate_best_action()
+        
         # Delete children to save RAM
         del self.children
 
@@ -81,19 +111,11 @@ class DecisionTree(object):
     def create_children(self):
         """For each Action in the availableActions, create a decision tree with a hardcopy
         of the board state. If we just 'did nothing', don't make children."""
-        # If action is to stop early, don't create children.
-        if isinstance(self.action, Action.DoNothingAction):
-            self.children = []
-            return
-        # If this is the (e.g. 4th) action, stop looking ahead.  CPU can't handle it.
-        if self.level >= MAX_ACTION_LOOKAHEAD:
-            self.children = []
-            return
         actionCount = len(self.availableActions)
         self.children = [None] * actionCount
 
         # Split creation into multiple threads if this is the master node.
-        if self.level == 0:
+        if self.level == 0 and USE_THREADS:
             threads = [None] * actionCount
             for idx in range(actionCount):
                 threads[idx] = threading.Thread(target=create_child, args=(self, idx))
@@ -103,6 +125,10 @@ class DecisionTree(object):
         else:
             for idx in range(actionCount):
                 create_child(self, idx)
+                # Stop making child branches if the most recent child branch already found lethal.
+                if self.children[idx].get_max_win_strength() == WIN_VALUE:
+                    self.children = self.children[:idx+1]
+                    break
 
 
     def calculate_my_win_strength(self):

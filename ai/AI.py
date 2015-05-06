@@ -13,12 +13,20 @@ class AI(object):
         self.strategy = strategy
         self.name = name
 
+
     def play_turn(self, board):
         """Execute all of the actions on the board for this turn, then end the turn 
         and give the game back to the human."""
         while True:
             loop.refresh(board)
-            time.sleep(1)
+            time.sleep(0.3)
+
+            # Check if we have lethal.
+            #lethalActions = check_for_lethal(board)
+            #if lethalActions is not None:
+            #    lethalActions[0].perform(board)
+            #    continue
+
             tree = DT(board, strategy=self.strategy)
             bestAction = tree.bestAction
             del tree
@@ -31,6 +39,14 @@ class AI(object):
         loop.end_turn(board)
 
 
-    def select_random_action(self, actions):
-        """Of the actions, choose one randomly and perform it."""
-        return random.choice(actions)
+    def check_for_lethal(self, board):
+        """Naively check if the available attacks on the enemy Hero added up will kill him.  If a possible
+        lethal in a couple actions is possible, it will be found be the tree anyway."""
+        pass
+        # Get available actions
+        # Find actions that damage the enemy hero.
+        # Compare total damage with health
+        # if HeroDies:
+        #     return the list of actions.
+        # else:
+        #     return None
