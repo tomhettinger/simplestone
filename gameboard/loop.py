@@ -23,9 +23,13 @@ def enemy(side):
         raise Exception('Invalid side: %s' % side)
 
 
+def clear():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+
 def refresh(board):
     """Clear the board and redraw it."""
-    os.system('clear')
+    clear()
     #print board
 
     # Border
