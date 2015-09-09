@@ -29,10 +29,11 @@ Kill the opponent by attacking them directly, and bringing their HP down to 0.  
 
 Each turn, your mana pool increases by one and is reset to full.  Use these mana points to play cards onto the field.  Use your minions to attack the enemy (must wait one turn).
 
-Enemy minions with taunt  \ minion / must be killed before attacking another enemy character.
-Enemy minions with divine shield ( minion ) receive one free hit before taking damage.
-Enemy minions with charge can attack on the same turn they are played form the hand.
+Enemy minions with taunt `\ minion /` must be killed before attacking another enemy character.
 
+Enemy minions with divine shield `( minion )` receive one free hit before taking damage.
+
+Enemy minions with charge can attack on the same turn they are played form the hand.
 
 ## The AI
 
